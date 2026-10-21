@@ -65,5 +65,7 @@ Check that the statements target `participations` (the dump may quote the table 
 
 ```sh
 npx wrangler d1 migrations apply cores-db --local
-ADMIN_PASSWORD='at-least-12-chars' npx wrangler pages dev dist --d1=DB --binding ADMIN_PASSWORD="$ADMIN_PASSWORD"
+npx wrangler pages dev dist --binding ADMIN_PASSWORD='at-least-12-chars'
 ```
+
+The `DB` binding is read from `wrangler.toml`; keep the same `database_id` for the migration and the preview so both use the same local database.
