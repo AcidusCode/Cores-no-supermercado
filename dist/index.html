@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>De que cor é o teu supermercado?</title><link rel="stylesheet" href="style.css?v=v3"></head>
+<body class="is-onboarding"><header><a class="brand" href="./">c<span class="brand-dot"></span>res<span class="brand-small">no supermercado</span></a><span class="tag">UM ESTUDO DE ERGONOMIA COGNITIVA</span></header><main><div id="mode" class="notice"></div><section id="welcome" data-step="0" class="onboarding" aria-label="Apresentação do estudo">
+ <div id="language-control" class="language-control"><label for="language">Idioma / Language</label><select id="language"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></div>
+ <div class="onboarding-content">
+  <img id="onboarding-illustration" class="onboarding-illustration" src="assets/apresentacao.png" alt="" hidden>
+  <img class="onboarding-logo" src="assets/logo-carrito.png" alt="Cores no supermercado" width="2172" height="724">
+  <div class="onboarding-copy" aria-live="polite">
+   <h1 id="onboarding-title" tabindex="-1">Bem-vindo</h1>
+   <p id="onboarding-description">Que cores associas aos alimentos? Partilha as tuas escolhas neste breve questionário.</p>
+   <div id="consent-panel" hidden>
+    <p class="consent-details" hidden>Estudo académico sobre associações de cores. A participação é voluntária e podes sair antes de concluir. Não pedimos nome nem email. No modo de demonstração, as respostas não são enviadas.</p>
+    <label class="consent"><input type="checkbox" id="consent"><span>Tenho 18 anos ou mais, faço compras em Portugal e aceito participar e partilhar as respostas para este estudo.</span></label>
+   </div>
+  </div>
+  <div class="onboarding-dots" role="group" aria-label="Etapas de apresentação">
+   <button type="button" class="onboarding-dot is-active" aria-label="Etapa 1 de 3: boas-vindas" aria-current="step" data-slide="0"></button>
+   <button type="button" class="onboarding-dot" aria-label="Etapa 2 de 3: sobre o estudo" data-slide="1"></button>
+   <button type="button" class="onboarding-dot" aria-label="Etapa 3 de 3: consentimento" data-slide="2"></button>
+  </div>
+ </div>
+ <div class="onboarding-actions">
+  <button id="onboarding-back" class="onboarding-back" type="button" hidden>Voltar</button>
+  <button id="onboarding-next" class="onboarding-next" type="button">Seguinte <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12h16m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+  <button id="start" class="onboarding-next" type="button" disabled hidden>Começar <span aria-hidden="true">→</span></button>
+ </div>
+ <a class="admin-entry" href="admin.html">Administração</a>
+</section><section id="instructions" class="instructions-screen" hidden aria-labelledby="instructions-title">
+ <img class="instructions-logo" src="assets/logo-carrito.png" alt="Cores no supermercado" width="2172" height="724">
+ <div class="instructions-copy">
+  <h1 id="instructions-title" tabindex="-1">Instruções</h1>
+  <p>Escolhe as cores que associas a cada categoria. Podes repetir cores ou indicar que não associas nenhuma. Depois, conta-nos porquê. Não há respostas certas ou erradas!</p>
+ </div>
+ <button id="begin-quiz" class="onboarding-next" type="button">Começar <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12h16m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</section><section id="quiz" class="category-screen" hidden aria-label="Questionário">
+ <div class="category-topbar">
+  <button id="exit-quiz" class="icon-button" aria-label="Sair do questionário" type="button"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path d="m4 4 16 16M20 4 4 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+  <div class="category-track" role="progressbar" aria-label="Categoria atual" aria-valuemin="0" aria-valuemax="7" id="category-progress"><div id="progress"></div></div>
+  <span id="step" aria-live="polite">01/07</span>
+ </div>
+ <h1 class="category-prompt" id="category-prompt">Seleciona as cores</h1>
+ <section id="color-section">
+  <div class="category-intro"><h2 id="category" tabindex="-1"></h2><p id="description"></p></div>
+  <div class="category-art"><div id="category-artwork" class="category-artwork"><img id="category-icon" src="assets/categories/peixe.svg" alt="" width="220" height="220"><svg id="category-tint" viewBox="0 0 220 223" aria-hidden="true" hidden><defs><mask id="food-mask" maskUnits="userSpaceOnUse" x="0" y="0" width="220" height="223" style="mask-type:alpha"><image id="mask-image" href="assets/categories/peixe.svg" width="220" height="223" preserveAspectRatio="xMidYMid meet"/></mask></defs><g mask="url(#food-mask)"><g id="color-stripes"></g><image id="shade-image" href="assets/categories/peixe.svg" width="220" height="223" preserveAspectRatio="xMidYMid meet" style="mix-blend-mode:multiply"/></g></svg></div></div>
+  <div id="palette" class="color-palette" role="group" aria-label="Cores disponíveis — podes selecionar várias"></div>
+  <p id="chosen" class="selection-summary" aria-live="polite">Escolhe uma ou mais cores.</p>
+  <div class="category-actions"><button id="confirm" class="onboarding-next" disabled>Selecionar cores</button><button id="none" class="onboarding-next outline-button">Não associo nenhuma cor</button></div>
+ </section>
+ <section id="reason-section" hidden aria-labelledby="reason-title">
+  <div class="reason-context"><img id="reason-icon" width="90" height="90" alt=""><p id="reason-category"></p><p id="reason-selection"></p></div>
+  <h2 id="reason-title" tabindex="-1">O que influenciou a tua escolha?</h2>
+  <p id="reason-hint">Podes escolher vários motivos.</p>
+  <div id="reasons"></div>
+  <label id="other-wrap" hidden>Qual foi a outra razão?<textarea id="other" maxlength="400" placeholder="Escreve uma breve explicação…"></textarea></label>
+  <p id="error" class="error" role="alert"></p>
+  <button id="next" class="onboarding-next">Continuar</button>
+  <button id="edit-colors" class="text-button">Alterar cores</button>
+ </section>
+</section>
+<dialog id="exit-dialog" aria-labelledby="exit-title"><h2 id="exit-title">Queres sair?</h2><p>Se saíres, perdes as escolhas desta participação. Nada foi enviado.</p><button id="resume-quiz" class="onboarding-next">Continuar a responder</button><button id="discard-quiz" class="text-button">Sair e descartar respostas</button></dialog>
+<section id="finish" class="finish-screen" hidden aria-labelledby="finish-title">
+ <div class="finish-composition">
+  <img class="finish-logo" src="assets/logo-carrito.png" alt="Cores no supermercado" width="2172" height="724">
+  <img class="finish-illustration" src="assets/obrigado.png" alt="Um carrinho de compras com um coração e a mensagem Obrigado!" width="1308" height="1224">
+  <div class="finish-copy">
+   <h1 id="finish-title" tabindex="-1">Obrigada pela <span class="handwritten">tua perspetiva.</span></h1>
+   <p>As tuas escolhas ajudam-nos a explorar a ligação entre cores, alimentos e sinalização nos supermercados. Obrigada por participares!</p>
+  </div>
+ </div>
+ <button id="return-home" class="onboarding-next">Voltar ao início</button>
+</section></main><footer><span>cores no supermercado</span><span>PERCEÇÃO · ASSOCIAÇÃO · DESIGN</span></footer><script src="config.js"></script><script src="i18n.js?v=v3"></script><script src="storage.js?v=v3"></script><script src="app.js?v=v3"></script><script src="onboarding.js?v=v3"></script></body></html>
