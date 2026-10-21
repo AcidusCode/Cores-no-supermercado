@@ -5,4 +5,4 @@ compatibility_date = "2025-01-01"
 [[d1_databases]]
 binding = "DB"
 database_name = "cores-db"
-database_id = "REPLACE_WITH_YOUR_D1_ID"
+database_id = "3ab03d87-ad69-4ecb-8eb3-d5729f125008"

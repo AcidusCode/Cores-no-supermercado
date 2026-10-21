@@ -27,5 +27,5 @@ test('wrangler.toml declares the Pages project and the DB binding', async () => 
   assert.match(toml, /\[\[d1_databases\]\]/);
   assert.match(toml, /binding\s*=\s*"DB"/);
   assert.match(toml, /database_name\s*=\s*"cores-db"/);
-  assert.match(toml, /database_id\s*=\s*"REPLACE_WITH_YOUR_D1_ID"/);
+  assert.match(toml, /database_id\s*=\s*"[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}"/);
 });
