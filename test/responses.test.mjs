@@ -31,6 +31,15 @@ test('POST /api/responses stores a validated record', async () => {
   assert.equal(JSON.parse(row.payload).answers.length, 7);
 });
 
+test('POST /api/responses stores an Italian record', async () => {
+  const env = {DB: createFakeD1()};
+  const res = await submit({request: post(validInput({language: 'it'})), env});
+  assert.equal(res.status, 200);
+  const [row] = rows(env);
+  assert.equal(row.language, 'it');
+  assert.equal(JSON.parse(row.payload).language, 'it');
+});
+
 test('POST /api/responses is idempotent per participant', async () => {
   const env = {DB: createFakeD1()};
   await submit({request: post(validInput()), env});

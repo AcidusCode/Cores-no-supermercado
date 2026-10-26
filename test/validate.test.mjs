@@ -59,3 +59,8 @@ test('withDefaults fills profile and comment on legacy stored records', () => {
   assert.deepEqual(withDefaults(legacy), {participant: 'a', profile: null, answers: [{category: 'peixe', comment: ''}]});
   assert.deepEqual(withDefaults({participant: 'b'}), {participant: 'b', profile: null});
 });
+
+test('language accepts pt, en, es and it; unknown languages are rejected', () => {
+  for (const language of ['pt', 'en', 'es', 'it']) assert.equal(validateRecord(validInput({language})).language, language);
+  for (const language of ['fr', 'IT', '', null, undefined]) assert.throws(() => validateRecord(validInput({language})), /Invalid participation/, String(language));
+});

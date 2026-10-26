@@ -20,7 +20,7 @@ let order=[],answers=[],index=0,selected=new Set(),noAssociation=false,busy=fals
 let participant=crypto.randomUUID();
 const colorIds=()=>COLORS.filter(c=>selected.has(c[0])).map(c=>c[0]);
 const selectionLabel=()=>noAssociation?t("Não associo nenhuma cor"):COLORS.filter(c=>selected.has(c[0])).map(c=>t(c[1])).join(', ');
-$('mode').textContent=online()?'Estudo académico · Respostas enviadas ao concluir.':'MODO DE DEMONSTRAÇÃO · As respostas não são enviadas.';
+const renderMode=()=>{$('mode').textContent=t(online()?'Estudo académico · Respostas enviadas ao concluir.':'MODO DE DEMONSTRAÇÃO · As respostas não são enviadas.');};
 $('consent').onchange=()=>{$('start').disabled=!$('consent').checked;};
 const SCREENS=['welcome','profile','instructions'];
 function showScreen(id,title){SCREENS.forEach(s=>{$(s).hidden=s!==id;});if(title)$(title).focus({preventScroll:true});window.scrollTo(0,0);}
@@ -49,7 +49,7 @@ function fillCountries(){
  select.replaceChildren(empty,...COUNTRIES.map(code=>{const o=document.createElement('option');o.value=code;o.textContent=label(code);return o;}).sort((a,b)=>a.textContent.localeCompare(b.textContent,LANGUAGES[getLanguage()])));
  select.value=keep;
 }
-window.renderProfileLanguage=fillCountries;
+window.renderProfileLanguage=()=>{fillCountries();renderMode();};
 function clearProfile(){profile=null;$('profile-form').reset();document.querySelectorAll('#profile .field-error').forEach(x=>{x.textContent='';});document.querySelectorAll('#profile [aria-invalid]').forEach(x=>x.removeAttribute('aria-invalid'));}
 $('quiz-back').onclick=()=>{
  if(busy)return;
