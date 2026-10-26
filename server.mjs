@@ -5,13 +5,15 @@ import {resolve,dirname,extname,sep} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {randomBytes,timingSafeEqual,createHash} from 'node:crypto';
 import {DatabaseSync} from 'node:sqlite';
-import {validateRecord} from './lib/validate.mjs';
+import {validateRecord,withDefaults} from './lib/validate.mjs';
 const base=dirname(fileURLToPath(import.meta.url)),publicRoot=resolve(base,'dist');
 const databasePath=resolve(process.env.DATA_FILE||resolve(base,'data/respostas.db'));
 const password=process.env.ADMIN_PASSWORD;
 if(!password||password.length<12){console.error('Define ADMIN_PASSWORD com pelo menos 12 caracteres antes de iniciar.');process.exit(1);}
 await mkdir(dirname(databasePath),{recursive:true});
 const db=new DatabaseSync(databasePath);db.exec('PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; CREATE TABLE IF NOT EXISTS participations (participant TEXT PRIMARY KEY, submitted_at TEXT NOT NULL, language TEXT NOT NULL, payload TEXT NOT NULL);');
+// Idempotent upgrade of an existing DB file (same change as migrations/0002_profile_and_comments.sql).
+if(!db.prepare("PRAGMA table_info('participations')").all().some(c=>c.name==='profile'))db.exec('ALTER TABLE participations ADD COLUMN profile TEXT');
 const sessions=new Map(),attempts=new Map(),submissions=new Map();
 const json=(res,status,data)=>{res.writeHead(status,{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'});res.end(JSON.stringify(data));};
 const hash=s=>createHash('sha256').update(s).digest();
@@ -37,14 +39,14 @@ const server=http.createServer(async(req,res)=>{
   }
   if(path==='/api/admin/responses'&&req.method==='GET'){
    if(!authorized(req))return json(res,401,{ok:false});
-   const rows=db.prepare('SELECT payload FROM participations ORDER BY submitted_at DESC').all();return json(res,200,{records:rows.map(row=>JSON.parse(row.payload))});
+   const rows=db.prepare('SELECT payload FROM participations ORDER BY submitted_at DESC').all();return json(res,200,{records:rows.map(row=>withDefaults(JSON.parse(row.payload)))});
   }
   if(path==='/api/responses'&&req.method==='POST'){
    if(limited(submissions,req.socket.remoteAddress||'unknown',240,3600000))return json(res,429,{ok:false});
    const input=await body(req);if(input.action!=='submit')return json(res,400,{ok:false});
    let record;try{record=validateRecord(input);}catch{return json(res,400,{ok:false});}
    // Participant UUID is an idempotency key: retrying never creates duplicate rows.
-   db.prepare('INSERT INTO participations (participant,submitted_at,language,payload) VALUES (?,?,?,?) ON CONFLICT(participant) DO NOTHING').run(record.participant,record.submittedAt,record.language,JSON.stringify(record));return json(res,200,{ok:true});
+   db.prepare('INSERT INTO participations (participant,submitted_at,language,payload,profile) VALUES (?,?,?,?,?) ON CONFLICT(participant) DO NOTHING').run(record.participant,record.submittedAt,record.language,JSON.stringify(record),record.profile&&JSON.stringify(record.profile));return json(res,200,{ok:true});
   }
   if(path.startsWith('/api/'))return json(res,404,{ok:false});
   if(req.method!=='GET'&&req.method!=='HEAD')return json(res,405,{ok:false});

@@ -67,3 +67,30 @@ test('POST /api/responses enforces same-origin when Origin is present', async ()
   assert.equal(good.status, 200);
   assert.equal(rows(env).length, 1);
 });
+
+test('POST /api/responses stores profile and comments in payload and the profile column', async () => {
+  const env = {DB: createFakeD1()};
+  const profile = {age: 40, country: 'BR', gender: 'outro', frequency: 'mensal', marketTypes: ['mercado_fresco']};
+  const input = validInput({profile});
+  input.answers[2].comment = ' gosto do cheiro ';
+  const res = await submit({request: post(input), env});
+  assert.equal(res.status, 200);
+  const [row] = rows(env);
+  assert.deepEqual(JSON.parse(row.profile), profile);
+  const payload = JSON.parse(row.payload);
+  assert.deepEqual(payload.profile, profile);
+  assert.equal(payload.answers[2].comment, 'gosto do cheiro');
+});
+
+test('POST /api/responses without profile (old client) still works and stores NULL', async () => {
+  const env = {DB: createFakeD1()};
+  assert.equal((await submit({request: post(validInput()), env})).status, 200);
+  assert.equal(rows(env)[0].profile, null);
+});
+
+test('POST /api/responses rejects a malformed profile with 400', async () => {
+  const env = {DB: createFakeD1()};
+  const res = await submit({request: post(validInput({profile: {age: 17}})), env});
+  assert.equal(res.status, 400);
+  assert.equal(rows(env).length, 0);
+});

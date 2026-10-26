@@ -11,8 +11,8 @@ export async function onRequestPost({request, env}) {
   try {
     // Participant UUID is an idempotency key: retrying never creates duplicate rows.
     await env.DB
-      .prepare('INSERT INTO participations (participant,submitted_at,language,payload) VALUES (?,?,?,?) ON CONFLICT(participant) DO NOTHING')
-      .bind(record.participant, record.submittedAt, record.language, JSON.stringify(record))
+      .prepare('INSERT INTO participations (participant,submitted_at,language,payload,profile) VALUES (?,?,?,?,?) ON CONFLICT(participant) DO NOTHING')
+      .bind(record.participant, record.submittedAt, record.language, JSON.stringify(record), record.profile && JSON.stringify(record.profile))
       .run();
   } catch {
     return json(500, {ok: false});

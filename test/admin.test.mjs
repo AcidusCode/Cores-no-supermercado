@@ -77,14 +77,14 @@ test('GET responses requires a valid session', async () => {
 
 test('GET responses returns parsed payloads ordered by submitted_at DESC', async () => {
   const env = {ADMIN_PASSWORD: PASSWORD, DB: createFakeD1()};
-  const insert = env.DB.raw.prepare('INSERT INTO participations VALUES (?,?,?,?)');
+  const insert = env.DB.raw.prepare('INSERT INTO participations (participant,submitted_at,language,payload) VALUES (?,?,?,?)');
   insert.run('a', '2025-01-01T00:00:00.000Z', 'pt', JSON.stringify({participant: 'a'}));
   insert.run('c', '2025-03-01T00:00:00.000Z', 'en', JSON.stringify({participant: 'c'}));
   insert.run('b', '2025-02-01T00:00:00.000Z', 'es', JSON.stringify({participant: 'b'}));
   const cookie = await authCookie(env);
   const res = await list({request: new Request(url('/api/admin/responses'), {headers: {cookie}}), env});
   assert.equal(res.status, 200);
-  assert.deepEqual(await res.json(), {records: [{participant: 'c'}, {participant: 'b'}, {participant: 'a'}]});
+  assert.deepEqual(await res.json(), {records: [{participant: 'c', profile: null}, {participant: 'b', profile: null}, {participant: 'a', profile: null}]});
   assert.equal(res.headers.get('cache-control'), 'no-store');
 });
 
@@ -96,4 +96,20 @@ test('end to end: a submitted response shows up for an authenticated admin', asy
   const {records} = await res.json();
   assert.equal(records.length, 1);
   assert.equal(records[0].participant, '123e4567-e89b-12d3-a456-426614174000');
+});
+
+test('GET responses exposes profile and comment, and defaults them for legacy rows', async () => {
+  const env = {ADMIN_PASSWORD: PASSWORD, DB: createFakeD1()};
+  const profile = {age: 25, country: 'PT', gender: 'masculino', frequency: 'diaria', marketTypes: ['loja']};
+  const input = validInput({profile});
+  input.answers[0].comment = 'nota';
+  await submit({request: new Request(url('/api/responses'), {method: 'POST', body: JSON.stringify(input)}), env});
+  const legacy = {participant: 'old', answers: [{category: 'peixe'}]};
+  env.DB.raw.prepare('INSERT INTO participations (participant,submitted_at,language,payload) VALUES (?,?,?,?)').run('old', '2020-01-01', 'pt', JSON.stringify(legacy));
+  const cookie = await authCookie(env);
+  const {records} = await (await list({request: new Request(url('/api/admin/responses'), {headers: {cookie}}), env})).json();
+  assert.deepEqual(records[0].profile, profile);
+  assert.equal(records[0].answers[0].comment, 'nota');
+  assert.equal(records[0].answers[1].comment, '');
+  assert.deepEqual(records[1], {participant: 'old', profile: null, answers: [{category: 'peixe', comment: ''}]});
 });
