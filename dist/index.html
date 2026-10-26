@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>De que cor é o teu supermercado?</title><link rel="stylesheet" href="style.css?v=v4"></head>
+<html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>De que cor é o teu supermercado?</title><link rel="stylesheet" href="style.css?v=v6"></head>
 <body class="is-onboarding"><header><a class="brand" href="./">c<span class="brand-dot"></span>res<span class="brand-small">no supermercado</span></a><span class="tag">UM ESTUDO DE ERGONOMIA COGNITIVA</span></header><main><div id="mode" class="notice"></div><section id="welcome" data-step="0" class="onboarding" aria-label="Apresentação do estudo">
  <div id="language-control" class="language-control"><label for="language">Idioma / Language</label><select id="language"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></div>
  <div class="onboarding-content">
@@ -51,6 +51,7 @@
 </section><section id="quiz" class="category-screen" hidden aria-label="Questionário">
  <div class="category-topbar">
   <button id="exit-quiz" class="icon-button" aria-label="Sair do questionário" type="button"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path d="m4 4 16 16M20 4 4 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+  <button id="quiz-back" class="back-button back-button--top" type="button"><span aria-hidden="true">←</span> Voltar</button>
   <div class="category-track" role="progressbar" aria-label="Categoria atual" aria-valuemin="0" aria-valuemax="7" id="category-progress"><div id="progress"></div></div>
   <span id="step" aria-live="polite">01/07</span>
  </div>
@@ -73,7 +74,6 @@
   <button id="next" class="onboarding-next">Continuar</button>
   <button id="edit-colors" class="text-button">Alterar cores</button>
  </section>
- <div class="screen-actions quiz-nav"><button id="quiz-back" class="back-button" type="button"><span aria-hidden="true">←</span> Voltar</button></div>
 </section>
 <dialog id="exit-dialog" aria-labelledby="exit-title"><h2 id="exit-title">Queres sair?</h2><p>Se saíres, perdes as escolhas desta participação. Nada foi enviado.</p><button id="resume-quiz" class="onboarding-next">Continuar a responder</button><button id="discard-quiz" class="text-button">Sair e descartar respostas</button></dialog>
 <section id="finish" class="finish-screen" hidden aria-labelledby="finish-title">

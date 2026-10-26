@@ -64,10 +64,10 @@ test('profile and per-answer comment reach the saved participation', () => {
  assert.doesNotMatch(read('storage.js'), /pick|whitelist/);
 });
 
-test('cache-busting query is v4', () => {
+test('cache-busting queries are bumped past v3', () => {
  assert.doesNotMatch(html, /\?v=v3/);
  assert.doesNotMatch(read('admin.html'), /\?v=v3/);
- assert.match(html, /style\.css\?v=v4/);
+ assert.match(html, /style\.css\?v=v6/);
  assert.match(html, /app\.js\?v=v4/);
 });
 
