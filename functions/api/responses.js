@@ -9,10 +9,11 @@ export async function onRequestPost({request, env}) {
   let record;
   try { record = validateRecord(input); } catch { return json(400, {ok: false}); }
   try {
+    // The full record (profile and comments included) lives in payload; no extra columns.
     // Participant UUID is an idempotency key: retrying never creates duplicate rows.
     await env.DB
-      .prepare('INSERT INTO participations (participant,submitted_at,language,payload,profile) VALUES (?,?,?,?,?) ON CONFLICT(participant) DO NOTHING')
-      .bind(record.participant, record.submittedAt, record.language, JSON.stringify(record), record.profile && JSON.stringify(record.profile))
+      .prepare('INSERT INTO participations (participant,submitted_at,language,payload) VALUES (?,?,?,?) ON CONFLICT(participant) DO NOTHING')
+      .bind(record.participant, record.submittedAt, record.language, JSON.stringify(record))
       .run();
   } catch {
     return json(500, {ok: false});

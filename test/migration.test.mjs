@@ -19,18 +19,6 @@ test('migration creates the participations table with the expected schema', asyn
   db.close();
 });
 
-test('migration 0002 adds a nullable profile column and is safe on existing rows', async () => {
-  const db = new DatabaseSync(':memory:');
-  db.exec(await readFile(new URL('migrations/0001_init.sql', root), 'utf8'));
-  db.prepare('INSERT INTO participations (participant,submitted_at,language,payload) VALUES (?,?,?,?)').run('old', '2025-01-01', 'pt', '{}');
-  db.exec(await readFile(new URL('migrations/0002_profile_and_comments.sql', root), 'utf8'));
-  const col = db.prepare("PRAGMA table_info('participations')").all().find(c => c.name === 'profile');
-  assert.deepEqual([col.type, col.notnull], ['TEXT', 0]);
-  assert.equal(db.prepare('SELECT profile FROM participations').get().profile, null);
-  assert.equal(db.prepare('SELECT COUNT(*) AS n FROM participations').get().n, 1);
-  db.close();
-});
-
 test('wrangler.toml declares the Pages project and the DB binding', async () => {
   const toml = await readFile(new URL('wrangler.toml', root), 'utf8');
   assert.match(toml, /^name\s*=\s*"cores-no-supermercado"/m);

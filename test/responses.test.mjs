@@ -68,24 +68,25 @@ test('POST /api/responses enforces same-origin when Origin is present', async ()
   assert.equal(rows(env).length, 1);
 });
 
-test('POST /api/responses stores profile and comments in payload and the profile column', async () => {
+test('POST /api/responses stores profile and comments in payload on the 0001-only schema', async () => {
   const env = {DB: createFakeD1()};
+  assert.deepEqual(env.DB.raw.prepare("PRAGMA table_info('participations')").all().map(c => c.name), ['participant', 'submitted_at', 'language', 'payload']);
   const profile = {age: 40, country: 'BR', gender: 'outro', frequency: 'mensal', marketTypes: ['mercado_fresco']};
   const input = validInput({profile});
   input.answers[2].comment = ' gosto do cheiro ';
   const res = await submit({request: post(input), env});
   assert.equal(res.status, 200);
   const [row] = rows(env);
-  assert.deepEqual(JSON.parse(row.profile), profile);
   const payload = JSON.parse(row.payload);
   assert.deepEqual(payload.profile, profile);
   assert.equal(payload.answers[2].comment, 'gosto do cheiro');
+  assert.equal(env.DB.raw.prepare("SELECT json_extract(payload,'$.profile.age') AS age FROM participations").get().age, 40);
 });
 
-test('POST /api/responses without profile (old client) still works and stores NULL', async () => {
+test('POST /api/responses without profile (old client) still works and stores profile null in payload', async () => {
   const env = {DB: createFakeD1()};
   assert.equal((await submit({request: post(validInput()), env})).status, 200);
-  assert.equal(rows(env)[0].profile, null);
+  assert.equal(JSON.parse(rows(env)[0].payload).profile, null);
 });
 
 test('POST /api/responses rejects a malformed profile with 400', async () => {

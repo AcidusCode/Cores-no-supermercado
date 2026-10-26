@@ -4,7 +4,7 @@ import {DatabaseSync} from 'node:sqlite';
 // In-memory fake of the D1 binding (prepare().bind().run()/all()) backed by node:sqlite.
 export function createFakeD1() {
   const db = new DatabaseSync(':memory:');
-  for (const file of ['0001_init.sql', '0002_profile_and_comments.sql']) db.exec(readFileSync(new URL(`../../migrations/${file}`, import.meta.url), 'utf8'));
+  db.exec(readFileSync(new URL('../../migrations/0001_init.sql', import.meta.url), 'utf8'));
   return {
     prepare(sql) {
       let params = [];

@@ -18,7 +18,13 @@ npx wrangler d1 migrations apply cores-db --remote
 
 For local development use `--local` instead of `--remote`.
 
-This applies every pending migration (`0001_init.sql`, `0002_profile_and_comments.sql`). On a database that already exists, run it again **before** deploying the frontend that asks for the participant profile. `0002` only adds a nullable `profile` column, so existing rows and older cached pages keep working (their `profile` is stored as `NULL`). The Node server (`server.mjs`) adds that column by itself on start-up.
+This release needs **no new migration**: the participant profile and the per-category comments are stored inside the existing `payload` JSON column, so the `0001_init.sql` schema is enough. If `0001` is already applied on your database, there is nothing to run before deploying.
+
+To analyse the profile in SQL, read it from the payload with `json_extract`:
+
+```sh
+npx wrangler d1 execute cores-db --remote --command "SELECT json_extract(payload,'$.profile.age') AS age, COUNT(*) AS n FROM participations GROUP BY age"
+```
 
 ## 3. Set the admin password
 
