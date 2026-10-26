@@ -18,6 +18,8 @@ npx wrangler d1 migrations apply cores-db --remote
 
 For local development use `--local` instead of `--remote`.
 
+This applies every pending migration (`0001_init.sql`, `0002_profile_and_comments.sql`). On a database that already exists, run it again **before** deploying the frontend that asks for the participant profile. `0002` only adds a nullable `profile` column, so existing rows and older cached pages keep working (their `profile` is stored as `NULL`). The Node server (`server.mjs`) adds that column by itself on start-up.
+
 ## 3. Set the admin password
 
 The password needs at least 12 characters. Without it, the admin endpoints answer `500`.
