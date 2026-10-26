@@ -12,7 +12,7 @@ const translations={
 'Um estudo académico sobre cores e alimentos. Participar é voluntário, sem nome nem email. Podes sair a qualquer momento antes de concluir.':['An academic study about colours and food. Participation is voluntary, with no name or email required. You can leave at any time before finishing.','Un estudio académico sobre colores y alimentos. Participar es voluntario, sin nombre ni correo. Puedes salir en cualquier momento antes de terminar.'],
 'Modo de teste: respostas guardadas apenas neste navegador.':['Test mode: responses saved only in this browser.','Modo de prueba: las respuestas se guardan solo en este navegador.'],
 'Consentimento':['Consent','Consentimiento'],
-'Tenho 18 anos ou mais, faço compras em Portugal e aceito participar e partilhar as respostas para este estudo.':['I am 18 or older, shop in Portugal and agree to participate and share my responses for this study.','Tengo 18 años o más, compro en Portugal y acepto participar y compartir mis respuestas para este estudio.'],
+'Tenho 18 anos ou mais e aceito participar e partilhar as respostas para este estudo.':['I am 18 or older and agree to participate and share my responses for this study.','Tengo 18 años o más y acepto participar y compartir mis respuestas para este estudio.'],
 'Seguinte':['Next','Siguiente'],'Começar':['Start','Comenzar'],'Voltar':['Back','Volver'],
 'Instruções':['Instructions','Instrucciones'],
 'Escolhe as cores que associas a cada categoria. Podes repetir cores ou indicar que não associas nenhuma. Depois, conta-nos porquê. Não há respostas certas ou erradas!':['Choose the colours you associate with each category. You can reuse colours or choose no association. Then tell us why. There are no right or wrong answers!','Elige los colores que asocias con cada categoría. Puedes repetir colores o indicar que no asocias ninguno. Después, cuéntanos por qué. ¡No hay respuestas correctas o incorrectas!'],
@@ -65,8 +65,19 @@ const translations={
 'Alimentos vendidos congelados, como refeições, vegetais, peixe e gelados.':['Frozen foods such as meals, vegetables, fish and ice cream.','Alimentos congelados, como comidas preparadas, verduras, pescado y helados.'],
 'Bebidas':['Drinks','Bebidas'],
 'Água, refrigerantes, sumos e outras bebidas não alcoólicas.':['Water, soft drinks, juices and other non-alcoholic drinks.','Agua, refrescos, zumos y otras bebidas sin alcohol.'],
-'Vermelho':['Red','Rojo'],'Amarelo':['Yellow','Amarillo'],'Laranja':['Orange','Naranja'],'Verde':['Green','Verde'],'Azul':['Blue','Azul'],'Roxo':['Purple','Morado'],'Castanho':['Brown','Marrón'],'Rosa':['Pink','Rosa'],'Branco':['White','Blanco'],'Preto':['Black','Negro'],
+'Vermelho':['Red','Rojo'],'Amarelo':['Yellow','Amarillo'],'Laranja':['Orange','Naranja'],'Verde':['Green','Verde'],'Azul':['Blue','Azul'],'Roxo':['Purple','Morado'],'Castanho':['Brown','Marrón'],'Rosa':['Pink','Rosa'],'Branco':['White','Blanco'],'Preto':['Black','Negro'],'Cinzento':['Grey','Gris'],'Bege':['Beige','Beige'],
 'Um carrinho de compras com um coração e a mensagem Obrigado!':['A shopping cart with a heart and a thank-you message.','Un carrito de compras con un corazón y un mensaje de agradecimiento.'],
+'Sobre ti':['About you','Sobre ti'],
+'Estas perguntas ajudam-nos a interpretar as respostas. São todas obrigatórias e anónimas.':['These questions help us interpret the responses. All are required and anonymous.','Estas preguntas nos ayudan a interpretar las respuestas. Todas son obligatorias y anónimas.'],
+'Idade':['Age','Edad'],'País':['Country','País'],'Género':['Gender','Género'],
+'Seleciona…':['Select…','Selecciona…'],'Seleciona o teu país…':['Select your country…','Selecciona tu país…'],
+'Feminino':['Female','Femenino'],'Masculino':['Male','Masculino'],'Não-binário':['Non-binary','No binario'],'Outro':['Other','Otro'],'Prefiro não dizer':['Prefer not to say','Prefiero no decirlo'],
+'Com que frequência fazes compras de alimentos?':['How often do you shop for food?','¿Con qué frecuencia compras alimentos?'],
+'Todos os dias':['Every day','Todos los días'],'Várias vezes por semana':['Several times a week','Varias veces por semana'],'Uma vez por semana':['Once a week','Una vez por semana'],'De quinze em quinze dias':['Every two weeks','Cada dos semanas'],'Uma vez por mês':['Once a month','Una vez al mes'],'Raramente':['Rarely','Raramente'],
+'Onde costumas fazer compras? (uma ou mais opções)':['Where do you usually shop? (one or more options)','¿Dónde sueles comprar? (una o más opciones)'],
+'Supermercado':['Supermarket','Supermercado'],'Loja de bairro':['Local shop','Tienda de barrio'],'Mercado de frescos (praça de mercado)':['Fresh market (market square)','Mercado de productos frescos (plaza de mercado)'],'Mercado online':['Online market','Mercado en línea'],
+'Indica a tua idade (18 a 120).':['Enter your age (18 to 120).','Indica tu edad (18 a 120).'],'Seleciona o teu país.':['Select your country.','Selecciona tu país.'],'Seleciona uma opção.':['Select an option.','Selecciona una opción.'],'Seleciona pelo menos uma opção.':['Select at least one option.','Selecciona al menos una opción.'],
+'Comentário (opcional)':['Comment (optional)','Comentario (opcional)'],'Queres acrescentar algo sobre esta escolha?':['Would you like to add anything about this choice?','¿Quieres añadir algo sobre esta elección?'],'Sem cor associada':['No colour associated','Sin color asociado'],
 'Administração':['Administration','Administración']
 };
 let currentLanguage='pt';try{currentLanguage=localStorage.getItem('cores-language')||'pt';}catch{}
@@ -76,11 +87,11 @@ window.t=source=>currentLanguage==='pt'?source:(translations[source]?.[currentLa
 // Capture only initial static text. Dynamic content is translated at rendering time.
 const staticTexts=[];const walker=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);
 while(walker.nextNode()){const node=walker.currentNode;if(!node.parentElement.closest('script,style')&&translations[node.textContent.trim()])staticTexts.push([node,node.textContent.trim()]);}
-const attrs=[];document.querySelectorAll('[aria-label],[placeholder],[alt]').forEach(el=>{for(const key of ['aria-label','placeholder','alt'])if(translations[el.getAttribute(key)])attrs.push([el,key,el.getAttribute(key)]);});
+const attrs=[];document.querySelectorAll('[aria-label],[placeholder],[alt],[title]').forEach(el=>{for(const key of ['aria-label','placeholder','alt','title'])if(translations[el.getAttribute(key)])attrs.push([el,key,el.getAttribute(key)]);});
 window.applyLanguage=language=>{
  if(!LANGUAGES[language])return;currentLanguage=language;document.documentElement.lang=LANGUAGES[language];document.title=t('De que cor é o teu supermercado?');
  try{localStorage.setItem('cores-language',language);}catch{}
  staticTexts.forEach(([node,source])=>{if(node.isConnected)node.textContent=t(source);});attrs.forEach(([el,key,source])=>el.setAttribute(key,t(source)));
  const select=document.getElementById('language');if(select)select.value=language;
- window.renderOnboarding?.(false);
+ window.renderOnboarding?.(false);window.renderProfileLanguage?.();
 };

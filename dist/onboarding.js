@@ -33,7 +33,7 @@
   byId('consent-panel').hidden = current !== 2;
   byId('onboarding-next').hidden = current === 2;
   byId('start').hidden = current !== 2;
-  byId('onboarding-back').hidden = true;
+  byId('onboarding-back').hidden = current === 0;
   dots.forEach((dot, i) => {
    dot.classList.toggle('is-active', i === current);
    if (i === current) dot.setAttribute('aria-current', 'step');
@@ -42,9 +42,11 @@
   if (focus) byId('onboarding-title').focus({preventScroll:true});
   window.scrollTo({top:0, behavior:'instant'});
  }
+ window.goOnboarding=n=>showSlide(n);
  window.renderOnboarding=focus=>showSlide(current,focus);
  applyLanguage(getLanguage());
  studyReady.then(()=>showSlide(current,false));
+ byId('onboarding-back').onclick = () => showSlide(Math.max(current - 1, 0));
  byId('onboarding-next').onclick = () => showSlide(Math.min(current + 1, 2));
  dots.forEach(dot => {dot.onclick = () => showSlide(Number(dot.dataset.slide));});
 })();

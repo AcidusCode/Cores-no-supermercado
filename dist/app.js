@@ -9,29 +9,63 @@ const CATEGORIES = [
  {id:'congelados',name:'Congelados',description:'Alimentos vendidos congelados, como refeições, vegetais, peixe e gelados.'},
  {id:'bebidas',name:'Bebidas',description:'Água, refrigerantes, sumos e outras bebidas não alcoólicas.'}
 ];
-const COLORS=[['vermelho','Vermelho','#ff0000'],['amarelo','Amarelo','#f3e600'],['laranja','Laranja','#ff8a00'],['verde','Verde','#00b80b'],['azul','Azul','#418dca'],['roxo','Roxo','#9e60b6'],['castanho','Castanho','#9d6242'],['rosa','Rosa','#ef80b4'],['branco','Branco','#ffffff'],['preto','Preto','#000000']];
+const COLORS=[['vermelho','Vermelho','#ff0000'],['amarelo','Amarelo','#f3e600'],['laranja','Laranja','#ff8a00'],['verde','Verde','#00b80b'],['azul','Azul','#418dca'],['roxo','Roxo','#9e60b6'],['castanho','Castanho','#9d6242'],['rosa','Rosa','#ef80b4'],['branco','Branco','#ffffff'],['preto','Preto','#000000'],['cinzento','Cinzento','#9e9e9e'],['bege','Bege','#e8d5b0']];
 const REASONS=[['alimento','Cor dos alimentos.'],['embalagem','Embalagens ou marcas.'],['supermercado','Cores das secções.'],['ideia','Sensação ou ideia associada.'],['preferencia','Preferência pessoal.'],['nao_sei','Não sei explicar.'],['outra','Outra razão.']];
 const $=id=>document.getElementById(id);
 const shuffle=arr=>{arr=[...arr];for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;};
 const config=window.STUDY_CONFIG||{};
 const online=()=>studyRuntime.online;
-let order=[],answers=[],index=0,selected=new Set(),noAssociation=false,busy=false;
+const COUNTRIES='AD AE AF AG AI AL AM AO AR AS AT AU AW AX AZ BA BB BD BE BF BG BH BI BJ BL BM BN BO BQ BR BS BT BW BY BZ CA CC CD CF CG CH CI CK CL CM CN CO CR CU CV CW CX CY CZ DE DJ DK DM DO DZ EC EE EG EH ER ES ET FI FJ FK FM FO FR GA GB GD GE GF GG GH GI GL GM GN GP GQ GR GT GU GW GY HK HN HR HT HU ID IE IL IM IN IQ IR IS IT JE JM JO JP KE KG KH KI KM KN KP KR KW KY KZ LA LB LC LI LK LR LS LT LU LV LY MA MC MD ME MF MG MH MK ML MM MN MO MP MQ MR MS MT MU MV MW MX MY MZ NA NC NE NF NG NI NL NO NP NR NU NZ OM PA PE PF PG PH PK PL PM PN PR PS PT PW PY QA RE RO RS RU RW SA SB SC SD SE SG SH SI SJ SK SL SM SN SO SR SS ST SV SX SY SZ TC TD TG TH TJ TK TL TM TN TO TR TT TV TW TZ UA UG US UY UZ VA VC VE VG VI VN VU WF WS YE YT ZA ZM ZW'.split(' ');
+let order=[],answers=[],index=0,selected=new Set(),noAssociation=false,busy=false,profile=null;
 let participant=crypto.randomUUID();
 const colorIds=()=>COLORS.filter(c=>selected.has(c[0])).map(c=>c[0]);
 const selectionLabel=()=>noAssociation?t("Não associo nenhuma cor"):COLORS.filter(c=>selected.has(c[0])).map(c=>t(c[1])).join(', ');
 $('mode').textContent=online()?'Estudo académico · Respostas enviadas ao concluir.':'MODO DE DEMONSTRAÇÃO · As respostas não são enviadas.';
 $('consent').onchange=()=>{$('start').disabled=!$('consent').checked;};
-$('start').onclick=()=>{if(!$('consent').checked)return;$('welcome').hidden=true;$('instructions').hidden=false;$('instructions-title').focus({preventScroll:true});window.scrollTo(0,0);};
+const SCREENS=['welcome','profile','instructions'];
+function showScreen(id,title){SCREENS.forEach(s=>{$(s).hidden=s!==id;});if(title)$(title).focus({preventScroll:true});window.scrollTo(0,0);}
+$('start').onclick=()=>{if($('consent').checked)showScreen('profile','profile-title');};
+$('profile-back').onclick=()=>{showScreen('welcome');window.goOnboarding?.(2);};
+$('instructions-back').onclick=()=>showScreen('profile','profile-title');
+// Perfil: todos os campos obrigatórios; só avança com dados válidos.
+const field=(id,msg)=>{$(`${id}-error`).textContent=msg||'';const el=$(id);if(el)el.setAttribute('aria-invalid',String(Boolean(msg)));return msg?id:null;};
+function readProfile(){
+ const age=Number($('profile-age').value),markets=[...document.querySelectorAll('[name=market]:checked')].map(x=>x.value);
+ const bad=[
+  field('profile-age',$('profile-age').value.trim()&&Number.isInteger(age)&&age>=18&&age<=120?'':t('Indica a tua idade (18 a 120).')),
+  field('profile-country',COUNTRIES.includes($('profile-country').value)?'':t('Seleciona o teu país.')),
+  field('profile-gender',$('profile-gender').value?'':t('Seleciona uma opção.')),
+  field('profile-frequency',$('profile-frequency').value?'':t('Seleciona uma opção.')),
+  field('profile-market',markets.length?'':t('Seleciona pelo menos uma opção.'))
+ ].filter(Boolean);
+ if(bad.length){const first=bad[0]==='profile-market'?document.querySelector('[name=market]'):$(bad[0]);first.focus();return null;}
+ return {age,country:$('profile-country').value,gender:$('profile-gender').value,frequency:$('profile-frequency').value,marketTypes:markets};
+}
+$('profile-form').onsubmit=e=>{e.preventDefault();const p=readProfile();if(!p)return;profile=p;showScreen('instructions','instructions-title');};
+function fillCountries(){
+ const select=$('profile-country'),keep=select.value;let names;try{names=new Intl.DisplayNames([LANGUAGES[getLanguage()]],{type:'region'});}catch{}
+ const label=code=>{try{return names?.of(code)||code;}catch{return code;}};
+ const empty=document.createElement('option');empty.value='';empty.textContent=t('Seleciona o teu país…');
+ select.replaceChildren(empty,...COUNTRIES.map(code=>{const o=document.createElement('option');o.value=code;o.textContent=label(code);return o;}).sort((a,b)=>a.textContent.localeCompare(b.textContent,LANGUAGES[getLanguage()])));
+ select.value=keep;
+}
+window.renderProfileLanguage=fillCountries;
+function clearProfile(){profile=null;$('profile-form').reset();document.querySelectorAll('#profile .field-error').forEach(x=>{x.textContent='';});document.querySelectorAll('#profile [aria-invalid]').forEach(x=>x.removeAttribute('aria-invalid'));}
+$('quiz-back').onclick=()=>{
+ if(busy)return;
+ if(index===0){selected=new Set();noAssociation=false;answers=[];$('quiz').hidden=true;document.body.classList.remove('is-questionnaire');document.body.classList.add('is-onboarding');showScreen('instructions','instructions-title');return;}
+ const previous=answers.pop();index--;render();restore(previous);
+};
 $('begin-quiz').onclick=async()=>{
  await studyReady;
  if(!$('consent').checked)return;
  order=config.randomizeCategories===false?[...CATEGORIES]:shuffle(CATEGORIES);
  document.body.classList.remove('is-onboarding');document.body.classList.add('is-questionnaire');
- $('instructions').hidden=true;$('quiz').hidden=false;render();
+ index=0;answers=[];$('instructions').hidden=true;$('quiz').hidden=false;render();
 };
 function render(){
  selected=new Set();noAssociation=false;
- $('color-section').hidden=false;$('reason-section').hidden=true;$('error').textContent='';$('other').value='';$('other-wrap').hidden=true;
+ $('color-section').hidden=false;$('reason-section').hidden=true;$('error').textContent='';$('other').value='';$('comment').value='';$('other-wrap').hidden=true;
  $('step').textContent=`${String(index+1).padStart(2,'0')}/${String(order.length).padStart(2,'0')}`;
  $('progress').style.width=`${(index+1)/order.length*100}%`;$('category-progress').setAttribute('aria-valuenow',String(index+1));
  $('category').textContent=t(order[index].name);$('description').textContent=t(order[index].description);
@@ -62,9 +96,16 @@ function updateSelection(){
  $('confirm').disabled=selected.size===0;
  $('chosen').textContent=selected.size?`${selected.size} ${selected.size===1?t('cor selecionada'):t('cores selecionadas')}: ${selectionLabel()}`:t("Escolhe uma ou mais cores.");
 }
+function restore(a){
+ selected=new Set(a.colors);noAssociation=a.noAssociation;updateSelection();
+ document.querySelectorAll('[name=reason]').forEach(x=>{x.checked=a.reasons.includes(x.value);});
+ $('other-wrap').hidden=!a.reasons.includes('outra');$('other').value=a.other||'';$('comment').value=a.comment||'';showReasons();
+}
 function showReasons(){
  $('color-section').hidden=true;$('reason-section').hidden=false;$('category-prompt').textContent=t("Conta-nos porquê");
  $('reason-icon').src=`assets/categories/${order[index].id}.svg`;$('reason-category').textContent=t(order[index].name);$('reason-selection').textContent=selectionLabel();
+ const chips=noAssociation?[[t('Sem cor associada'),null]]:COLORS.filter(c=>selected.has(c[0])).map(c=>[t(c[1]),c[2]]);
+ $('reason-colors').replaceChildren(...chips.map(([name,hex])=>{const chip=document.createElement('span');chip.className='color-chip';if(hex){const dot=document.createElement('i');dot.style.background=hex;chip.append(dot);}chip.append(document.createTextNode(name));return chip;}));
  $('reason-title').textContent=noAssociation?t("Queres explicar porquê?"):t("O que influenciou a tua escolha?");
  $('reason-hint').textContent=noAssociation?t("Explicar é opcional."):t("Podes escolher vários motivos.");
  window.scrollTo(0,0);$('reason-title').focus({preventScroll:true});
@@ -80,22 +121,22 @@ $('next').onclick=async()=>{
  if(!noAssociation&&!selected.size){$('error').textContent=t("Escolhe uma cor ou indica que não associas nenhuma.");return;}
  if(!noAssociation&&!reasons.length){$('error').textContent=t("Seleciona um motivo ou “Não sei explicar”.");return;}
  if(reasons.includes('outra')&&!$('other').value.trim()){$('error').textContent=t("Escreve a outra razão ou desmarca essa opção.");return;}
- const answer={category:order[index].id,colors:colorIds(),hex:COLORS.filter(c=>selected.has(c[0])).map(c=>c[2]),noAssociation,reasons,other:reasons.includes('outra')?$('other').value.trim():'',position:index+1};
+ const answer={category:order[index].id,colors:colorIds(),hex:COLORS.filter(c=>selected.has(c[0])).map(c=>c[2]),noAssociation,reasons,other:reasons.includes('outra')?$('other').value.trim():'',comment:$('comment').value.trim(),position:index+1};
  if(index<order.length-1){answers.push(answer);index++;render();return;}
- const complete=[...answers,answer];busy=true;$('next').disabled=true;$('edit-colors').disabled=true;$('exit-quiz').disabled=true;$('next').textContent=online()?t("A guardar…"):t("A concluir…");
+ const complete=[...answers,answer];busy=true;$('next').disabled=true;$('edit-colors').disabled=true;$('exit-quiz').disabled=true;$('quiz-back').disabled=true;$('next').textContent=online()?t("A guardar…"):t("A concluir…");
  try{
-  await saveParticipation({participant,version:config.version,language:getLanguage(),consent:true,submittedAt:new Date().toISOString(),answers:complete,order:order.map(x=>x.id)});
+  await saveParticipation({participant,version:config.version,language:getLanguage(),consent:true,submittedAt:new Date().toISOString(),answers:complete,order:order.map(x=>x.id),profile});
   answers=complete;$('quiz').hidden=true;$('finish').hidden=false;document.body.classList.remove('is-questionnaire');document.body.classList.add('is-finished');
   $('finish-title').focus({preventScroll:true});
   window.scrollTo(0,0);
  }catch{$('error').textContent=t('Não foi possível guardar. As escolhas continuam nesta página. Verifica a ligação ou o armazenamento do navegador e tenta novamente.');$('next').textContent=t("Tentar guardar novamente");}
- finally{busy=false;$('next').disabled=false;$('edit-colors').disabled=false;$('exit-quiz').disabled=false;}
+ finally{busy=false;$('next').disabled=false;$('edit-colors').disabled=false;$('exit-quiz').disabled=false;$('quiz-back').disabled=false;}
 };
 $('exit-quiz').onclick=()=>{if(!busy)$('exit-dialog').showModal();};
 $('resume-quiz').onclick=()=>{$('exit-dialog').close();};
 $('discard-quiz').onclick=()=>{
- $('exit-dialog').close();answers=[];order=[];index=0;selected.clear();participant=crypto.randomUUID();
- $('quiz').hidden=true;$('instructions').hidden=false;document.body.classList.remove('is-questionnaire');document.body.classList.add('is-onboarding');window.scrollTo(0,0);$('instructions-title').focus({preventScroll:true});
+ $('exit-dialog').close();answers=[];order=[];index=0;selected.clear();participant=crypto.randomUUID();clearProfile();
+ $('quiz').hidden=true;document.body.classList.remove('is-questionnaire');document.body.classList.add('is-onboarding');showScreen('profile','profile-title');
 };
 
 // SVG alpha mask preserves the artwork silhouette. Equal vertical bands share its width.
@@ -108,4 +149,4 @@ function paintIcon(){
 }
 $('language').onchange=()=>{applyLanguage($('language').value);$('consent').checked=false;$('start').disabled=true;};
 $('return-home').onclick=()=>location.reload();
-applyLanguage(getLanguage());
+fillCountries();applyLanguage(getLanguage());

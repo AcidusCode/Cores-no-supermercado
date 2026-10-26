@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>De que cor é o teu supermercado?</title><link rel="stylesheet" href="style.css?v=v3"></head>
+<html lang="pt-PT"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>De que cor é o teu supermercado?</title><link rel="stylesheet" href="style.css?v=v4"></head>
 <body class="is-onboarding"><header><a class="brand" href="./">c<span class="brand-dot"></span>res<span class="brand-small">no supermercado</span></a><span class="tag">UM ESTUDO DE ERGONOMIA COGNITIVA</span></header><main><div id="mode" class="notice"></div><section id="welcome" data-step="0" class="onboarding" aria-label="Apresentação do estudo">
  <div id="language-control" class="language-control"><label for="language">Idioma / Language</label><select id="language"><option value="pt">Português</option><option value="en">English</option><option value="es">Español</option></select></div>
  <div class="onboarding-content">
@@ -10,7 +10,7 @@
    <p id="onboarding-description">Que cores associas aos alimentos? Partilha as tuas escolhas neste breve questionário.</p>
    <div id="consent-panel" hidden>
     <p class="consent-details" hidden>Estudo académico sobre associações de cores. A participação é voluntária e podes sair antes de concluir. Não pedimos nome nem email. No modo de demonstração, as respostas não são enviadas.</p>
-    <label class="consent"><input type="checkbox" id="consent"><span>Tenho 18 anos ou mais, faço compras em Portugal e aceito participar e partilhar as respostas para este estudo.</span></label>
+    <label class="consent"><input type="checkbox" id="consent"><span>Tenho 18 anos ou mais e aceito participar e partilhar as respostas para este estudo.</span></label>
    </div>
   </div>
   <div class="onboarding-dots" role="group" aria-label="Etapas de apresentação">
@@ -20,18 +20,34 @@
   </div>
  </div>
  <div class="onboarding-actions">
-  <button id="onboarding-back" class="onboarding-back" type="button" hidden>Voltar</button>
   <button id="onboarding-next" class="onboarding-next" type="button">Seguinte <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12h16m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <button id="start" class="onboarding-next" type="button" disabled hidden>Começar <span aria-hidden="true">→</span></button>
+  <button id="onboarding-back" class="onboarding-back" type="button" hidden><span aria-hidden="true">←</span> Voltar</button>
  </div>
  <a class="admin-entry" href="admin.html">Administração</a>
+</section><section id="profile" class="profile-screen" hidden aria-labelledby="profile-title">
+ <form id="profile-form" novalidate>
+  <h1 id="profile-title" tabindex="-1">Sobre ti</h1>
+  <p class="profile-intro">Estas perguntas ajudam-nos a interpretar as respostas. São todas obrigatórias e anónimas.</p>
+  <div class="field"><label for="profile-age">Idade</label><input id="profile-age" type="number" inputmode="numeric" min="18" max="120" step="1" required aria-describedby="profile-age-error"><p id="profile-age-error" class="field-error" role="alert"></p></div>
+  <div class="field"><label for="profile-country">País</label><select id="profile-country" required aria-describedby="profile-country-error"></select><p id="profile-country-error" class="field-error" role="alert"></p></div>
+  <div class="field"><label for="profile-gender">Género</label><select id="profile-gender" required aria-describedby="profile-gender-error"><option value="">Seleciona…</option><option value="feminino">Feminino</option><option value="masculino">Masculino</option><option value="nao_binario">Não-binário</option><option value="outro">Outro</option><option value="prefiro_nao_dizer">Prefiro não dizer</option></select><p id="profile-gender-error" class="field-error" role="alert"></p></div>
+  <div class="field"><label for="profile-frequency">Com que frequência fazes compras de alimentos?</label><select id="profile-frequency" required aria-describedby="profile-frequency-error"><option value="">Seleciona…</option><option value="diaria">Todos os dias</option><option value="varias_semana">Várias vezes por semana</option><option value="semanal">Uma vez por semana</option><option value="quinzenal">De quinze em quinze dias</option><option value="mensal">Uma vez por mês</option><option value="raramente">Raramente</option></select><p id="profile-frequency-error" class="field-error" role="alert"></p></div>
+  <fieldset class="field" aria-describedby="profile-market-error"><legend>Onde costumas fazer compras? (uma ou mais opções)</legend>
+   <label class="check-option"><input type="checkbox" name="market" value="supermercado"><span>Supermercado</span></label>
+   <label class="check-option"><input type="checkbox" name="market" value="loja"><span>Loja de bairro</span></label>
+   <label class="check-option"><input type="checkbox" name="market" value="mercado_fresco"><span>Mercado de frescos (praça de mercado)</span></label>
+   <label class="check-option"><input type="checkbox" name="market" value="online"><span>Mercado online</span></label>
+   <p id="profile-market-error" class="field-error" role="alert"></p></fieldset>
+  <div class="screen-actions"><button id="profile-submit" class="onboarding-next" type="submit">Continuar</button><button id="profile-back" class="back-button" type="button"><span aria-hidden="true">←</span> Voltar</button></div>
+ </form>
 </section><section id="instructions" class="instructions-screen" hidden aria-labelledby="instructions-title">
  <img class="instructions-logo" src="assets/logo-carrito.png" alt="Cores no supermercado" width="2172" height="724">
  <div class="instructions-copy">
   <h1 id="instructions-title" tabindex="-1">Instruções</h1>
   <p>Escolhe as cores que associas a cada categoria. Podes repetir cores ou indicar que não associas nenhuma. Depois, conta-nos porquê. Não há respostas certas ou erradas!</p>
  </div>
- <button id="begin-quiz" class="onboarding-next" type="button">Começar <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12h16m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+ <div class="screen-actions"><button id="begin-quiz" class="onboarding-next" type="button">Começar <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12h16m-7-7 7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button id="instructions-back" class="back-button" type="button"><span aria-hidden="true">←</span> Voltar</button></div>
 </section><section id="quiz" class="category-screen" hidden aria-label="Questionário">
  <div class="category-topbar">
   <button id="exit-quiz" class="icon-button" aria-label="Sair do questionário" type="button"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><path d="m4 4 16 16M20 4 4 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
@@ -47,15 +63,17 @@
   <div class="category-actions"><button id="confirm" class="onboarding-next" disabled>Selecionar cores</button><button id="none" class="onboarding-next outline-button">Não associo nenhuma cor</button></div>
  </section>
  <section id="reason-section" hidden aria-labelledby="reason-title">
-  <div class="reason-context"><img id="reason-icon" width="90" height="90" alt=""><p id="reason-category"></p><p id="reason-selection"></p></div>
+  <div class="reason-context"><img id="reason-icon" width="90" height="90" alt=""><p id="reason-category"></p><p id="reason-selection"></p><div id="reason-colors" class="reason-colors" aria-hidden="true"></div></div>
   <h2 id="reason-title" tabindex="-1">O que influenciou a tua escolha?</h2>
   <p id="reason-hint">Podes escolher vários motivos.</p>
   <div id="reasons"></div>
   <label id="other-wrap" hidden>Qual foi a outra razão?<textarea id="other" maxlength="400" placeholder="Escreve uma breve explicação…"></textarea></label>
+  <div class="comment-field"><label id="comment-label" for="comment">Comentário (opcional)</label><textarea id="comment" maxlength="400" placeholder="Queres acrescentar algo sobre esta escolha?"></textarea></div>
   <p id="error" class="error" role="alert"></p>
   <button id="next" class="onboarding-next">Continuar</button>
   <button id="edit-colors" class="text-button">Alterar cores</button>
  </section>
+ <div class="screen-actions quiz-nav"><button id="quiz-back" class="back-button" type="button"><span aria-hidden="true">←</span> Voltar</button></div>
 </section>
 <dialog id="exit-dialog" aria-labelledby="exit-title"><h2 id="exit-title">Queres sair?</h2><p>Se saíres, perdes as escolhas desta participação. Nada foi enviado.</p><button id="resume-quiz" class="onboarding-next">Continuar a responder</button><button id="discard-quiz" class="text-button">Sair e descartar respostas</button></dialog>
 <section id="finish" class="finish-screen" hidden aria-labelledby="finish-title">
@@ -68,4 +86,4 @@
   </div>
  </div>
  <button id="return-home" class="onboarding-next">Voltar ao início</button>
-</section></main><footer><span>cores no supermercado</span><span>PERCEÇÃO · ASSOCIAÇÃO · DESIGN</span></footer><script src="config.js"></script><script src="i18n.js?v=v3"></script><script src="storage.js?v=v3"></script><script src="app.js?v=v3"></script><script src="onboarding.js?v=v3"></script></body></html>
+</section></main><footer><span>cores no supermercado</span><span>PERCEÇÃO · ASSOCIAÇÃO · DESIGN</span></footer><script src="config.js"></script><script src="i18n.js?v=v4"></script><script src="storage.js?v=v4"></script><script src="app.js?v=v4"></script><script src="onboarding.js?v=v4"></script></body></html>

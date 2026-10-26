@@ -1,6 +1,7 @@
 'use strict';
 const categoryNames={peixe:'Peixe e marisco',hortofruticolas:'Fruta e legumes',carne:'Carne',lacteos:'Leite e derivados',padaria:'Pão e pastelaria',congelados:'Congelados',bebidas:'Bebidas'};
-const colors=[['vermelho','Vermelho','#ff0000'],['amarelo','Amarelo','#f3e600'],['laranja','Laranja','#ff8a00'],['verde','Verde','#00b80b'],['azul','Azul','#418dca'],['roxo','Roxo','#9e60b6'],['castanho','Castanho','#9d6242'],['rosa','Rosa','#ef80b4'],['branco','Branco','#fff'],['preto','Preto','#000']];
+const colors=[['vermelho','Vermelho','#ff0000'],['amarelo','Amarelo','#f3e600'],['laranja','Laranja','#ff8a00'],['verde','Verde','#00b80b'],['azul','Azul','#418dca'],['roxo','Roxo','#9e60b6'],['castanho','Castanho','#9d6242'],['rosa','Rosa','#ef80b4'],['branco','Branco','#fff'],['preto','Preto','#000'],['cinzento','Cinzento','#9e9e9e'],['bege','Bege','#e8d5b0']];
+const profileLabels={gender:{feminino:'Feminino',masculino:'Masculino',nao_binario:'Não-binário',outro:'Outro',prefiro_nao_dizer:'Prefiro não dizer'},frequency:{diaria:'Todos os dias',varias_semana:'Várias vezes por semana',semanal:'Uma vez por semana',quinzenal:'Quinzenal',mensal:'Uma vez por mês',raramente:'Raramente'},market:{supermercado:'Supermercado',loja:'Loja de bairro',mercado_fresco:'Mercado de frescos',online:'Online'}};
 const reasonNames={alimento:'Cor dos alimentos',embalagem:'Embalagens ou marcas',supermercado:'Cores das secções',ideia:'Sensação ou ideia',preferencia:'Preferência pessoal',nao_sei:'Não sei explicar',outra:'Outra razão'};
 const el=id=>document.getElementById(id),make=(tag,text,cls)=>{const node=document.createElement(tag);if(text!==undefined)node.textContent=text;if(cls)node.className=cls;return node;};
 let records=[],filtered=[],page=0,server=false;
@@ -42,11 +43,12 @@ function renderEntries(cat){
  [...filtered].sort((a,b)=>b.submittedAt.localeCompare(a.submittedAt)).slice(page*10,page*10+10).forEach(record=>{
   const detail=make('details',undefined,'entry'),summary=make('summary'),code=make('span',record.participant.slice(0,8), 'entry-code');code.title=record.participant;
   summary.append(code,make('span',`${new Date(record.submittedAt).toLocaleString('pt-PT')} · ${(record.language||'pt').toUpperCase()}`,'entry-date'));detail.append(summary,make('p',`Código completo: ${record.participant}`,'entry-code'));
+  const pr=record.profile;detail.append(make('p',pr?`Perfil: ${pr.age} anos · ${pr.country} · ${profileLabels.gender[pr.gender]||pr.gender} · ${profileLabels.frequency[pr.frequency]||pr.frequency} · ${(pr.marketTypes||[]).map(m=>profileLabels.market[m]||m).join(', ')}`:'Perfil: não indicado','entry-code'));
   record.answers.filter(a=>!cat||a.category===cat).forEach(answer=>{const line=make('div',undefined,'entry-answer'),content=make('div');line.append(make('strong',categoryNames[answer.category]||answer.category));
    if(answer.noAssociation)content.append(make('span','Sem associação'));
    else answer.colors.forEach(id=>{const color=colors.find(c=>c[0]===id);if(!color)return;const chip=make('span',undefined,'entry-color'),dot=make('i');dot.style.background=color[2];chip.append(dot,document.createTextNode(color[1]));content.append(chip);});
    content.append(make('p',answer.reasons.map(r=>reasonNames[r]||r).join(' · ')||'Sem motivo indicado'));
-   if(answer.other)content.append(make('p',answer.other));line.append(content);detail.append(line);
+   if(answer.other)content.append(make('p',answer.other));if(answer.comment)content.append(make('p',`Comentário: ${answer.comment}`));line.append(content);detail.append(line);
   });root.append(detail);
  });
  el('page-info').textContent=filtered.length?`${page+1} / ${maxPage+1}`:'0 / 0';el('previous-page').disabled=page===0;el('next-page').disabled=page>=maxPage;
@@ -57,9 +59,9 @@ for(const id of ['filter-category','filter-language','filter-from','filter-to','
 el('clear-filters').onclick=()=>{for(const id of ['filter-category','filter-language','filter-from','filter-to','search'])el(id).value='';page=0;render();};
 el('previous-page').onclick=()=>{page--;render();};el('next-page').onclick=()=>{page++;render();};el('refresh').onclick=load;
 el('export').onclick=()=>{
- const fields=['participant','submitted_at','language','category','colors','no_association','reasons','other','position'];
+ const fields=['participant','submitted_at','language','category','colors','no_association','reasons','other','position','age','country','gender','frequency','market_types','comment'];
  const safe=value=>{let s=String(value??'');if(/^[\s]*[=+@\-]/.test(s))s="'"+s;return '"'+s.replaceAll('"','""')+'"';};
- const rows=filtered.flatMap(r=>r.answers.filter(a=>!el('filter-category').value||a.category===el('filter-category').value).map(a=>[r.participant,r.submittedAt,r.language,a.category,a.colors.join('|'),a.noAssociation,a.reasons.join('|'),a.other,a.position]));
+ const rows=filtered.flatMap(r=>r.answers.filter(a=>!el('filter-category').value||a.category===el('filter-category').value).map(a=>[r.participant,r.submittedAt,r.language,a.category,a.colors.join('|'),a.noAssociation,a.reasons.join('|'),a.other,a.position,r.profile?.age,r.profile?.country,r.profile?.gender,r.profile?.frequency,(r.profile?.marketTypes||[]).join('|'),a.comment]));
  const csv='\ufeff'+[fields,...rows].map(row=>row.map(safe).join(',')).join('\r\n');const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='cores-respostas.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 };
 load();
