@@ -21,8 +21,14 @@ test('records without profile stay valid and get profile null', () => {
 test('a valid profile is kept; allowed lists are exported', () => {
   assert.deepEqual(validateRecord(validInput({profile: profile()})).profile, profile());
   assert.deepEqual(profileOptions.gender, ['feminino', 'masculino', 'nao_binario', 'outro', 'prefiro_nao_dizer']);
-  assert.deepEqual(profileOptions.frequency, ['diaria', 'varias_semana', 'semanal', 'quinzenal', 'mensal', 'raramente']);
+  assert.deepEqual(profileOptions.frequency, ['diaria', 'varias_semana', 'semanal', 'quinzenal', 'mensal', 'raramente', 'nunca']);
   assert.deepEqual(profileOptions.marketTypes, ['supermercado', 'loja', 'mercado_fresco', 'online']);
+});
+
+test('frequency "nunca" requires no market types; any other frequency requires at least one', () => {
+  assert.deepEqual(validateRecord(validInput({profile: profile({frequency: 'nunca', marketTypes: []})})).profile, profile({frequency: 'nunca', marketTypes: []}));
+  for (const marketTypes of [['loja'], 'loja', undefined]) assert.throws(() => validateRecord(validInput({profile: profile({frequency: 'nunca', marketTypes})})), /Invalid participation/, JSON.stringify(marketTypes));
+  assert.throws(() => validateRecord(validInput({profile: profile({frequency: 'raramente', marketTypes: []})})), /Invalid participation/);
 });
 
 test('age bounds are inclusive 18..120 and must be an integer', () => {

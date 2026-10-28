@@ -30,17 +30,19 @@ $('instructions-back').onclick=()=>showScreen('profile','profile-title');
 // Perfil: todos os campos obrigatórios; só avança com dados válidos.
 const field=(id,msg)=>{$(`${id}-error`).textContent=msg||'';const el=$(id);if(el)el.setAttribute('aria-invalid',String(Boolean(msg)));return msg?id:null;};
 function readProfile(){
- const age=Number($('profile-age').value),markets=[...document.querySelectorAll('[name=market]:checked')].map(x=>x.value);
+ const age=Number($('profile-age').value),never=$('profile-frequency').value==='nunca',markets=never?[]:[...document.querySelectorAll('[name=market]:checked')].map(x=>x.value);
  const bad=[
   field('profile-age',$('profile-age').value.trim()&&Number.isInteger(age)&&age>=18&&age<=120?'':t('Indica a tua idade (18 a 120).')),
   field('profile-country',COUNTRIES.includes($('profile-country').value)?'':t('Seleciona o teu país.')),
   field('profile-gender',$('profile-gender').value?'':t('Seleciona uma opção.')),
   field('profile-frequency',$('profile-frequency').value?'':t('Seleciona uma opção.')),
-  field('profile-market',markets.length?'':t('Seleciona pelo menos uma opção.'))
+  field('profile-market',never||markets.length?'':t('Seleciona pelo menos uma opção.'))
  ].filter(Boolean);
  if(bad.length){const first=bad[0]==='profile-market'?document.querySelector('[name=market]'):$(bad[0]);first.focus();return null;}
  return {age,country:$('profile-country').value,gender:$('profile-gender').value,frequency:$('profile-frequency').value,marketTypes:markets};
 }
+// 'Nunca' means no shopping place applies: hide and clear the question.
+$('profile-frequency').onchange=()=>{const never=$('profile-frequency').value==='nunca';$('profile-market-field').hidden=never;if(never){document.querySelectorAll('[name=market]').forEach(x=>{x.checked=false;});field('profile-market','');}};
 $('profile-form').onsubmit=e=>{e.preventDefault();const p=readProfile();if(!p)return;profile=p;showScreen('instructions','instructions-title');};
 function fillCountries(){
  const select=$('profile-country'),keep=select.value;let names;try{names=new Intl.DisplayNames([LANGUAGES[getLanguage()]],{type:'region'});}catch{}
